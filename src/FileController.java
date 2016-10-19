@@ -21,6 +21,9 @@ class FileController {
         String command = "";
         do {
             command = scanner.nextLine();
+//            command = "copy localhost:9999 ./src/MainLoop.class localhost:1026 lexmark0381.ddns.net:9091";
+//            command = "list localhost:9999";
+//            command = "copy localhost:9999 file localhost:9999";
             String[] Commands = command.split(" ");
             if (Commands[0].equals("list") || Commands[0].equals("copy") || Commands[0].equals("bye") || Commands[0].equals("help")) {
                 if (Commands[0].equals("list")) {
@@ -47,13 +50,8 @@ class FileController {
                             while ((line = reader.readLine()) != null) {
                                 System.out.println(line);
                             }
-                            reader.close();
+                            System.out.println("List done.");
                             socket.close();
-                            socket = null;
-                            outputStream = null;
-                            out = null;
-                            inputStream = null;
-                            reader = null;
                         } catch (Exception ex) {
                             System.out.println("Error during network operations: " + ex);
                         }
@@ -62,7 +60,6 @@ class FileController {
                     }
                 }
                 if (Commands[0].equals("copy")) {
-                    System.out.println(Commands.length);
                     if (Commands.length >= 4) {
                         String SourceServeraddress = Commands[1].split(":")[0];
                         String SourceServerport = Commands[1].split(":")[1];
@@ -72,21 +69,24 @@ class FileController {
                         for (int i = 3; i < Commands.length; i++) {
                             Destinations.add(Commands[i].toString());
                         }
-//                            System.out.println("Copying:\nFILE : " + file + "\nFROM: " + SourceServeraddress + ":" + SourceServerport + "\nTARGETS: ");
-                        for (String item : Destinations){
-                            System.out.println(item);
+                        try {
+                            socket = new Socket(SourceServeraddress, Integer.parseInt(SourceServerport));
+                            outputStream = socket.getOutputStream();
+                            out = new PrintWriter(outputStream);
+                            inputStream = socket.getInputStream();
+                            reader = new BufferedReader(new InputStreamReader(inputStream));
+                            out.println(command);
+                            out.flush();
+                            String line = null;
+                            while ((line = reader.readLine()) != null) {
+                                System.out.println(line);
+                            }
+                        } catch (Exception ex){
+                            System.out.println("Error while connecting to "+ Commands[1]);
                         }
-                        socket = new Socket(SourceServeraddress, Integer.parseInt(SourceServerport));
-                        outputStream = socket.getOutputStream();
-                        out = new PrintWriter(outputStream);
-                        inputStream = socket.getInputStream();
-                        reader = new BufferedReader(new InputStreamReader(inputStream));
-                        out.println(command);
-                        out.flush();
                     } else {
                         copyUsage();
                     }
-
 
                 }
                 if (Commands[0].equals("bye")) {
