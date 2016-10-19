@@ -1,16 +1,16 @@
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Scanner;
 import java.io.*;
 import java.net.Socket;
 class FileController {
     public static void main(String[] args) throws Exception {
-//      TODO SEPARATOR FOR COMMANDS.
         Socket socket = null;
         OutputStream outputStream = null;
         PrintWriter out = null;
         InputStream inputStream = null;
         BufferedReader reader = null;
-        Scanner scanner = new Scanner(System.in);
+        Console input = System.console();
         String port;
         System.out.println("Welcome to FileController!\n");
         System.out.println("List of available commands:");
@@ -20,10 +20,7 @@ class FileController {
         helpUsage();
         String command = "";
         do {
-            command = scanner.nextLine();
-//            command = "copy localhost:9999 ./src/MainLoop.class localhost:1026 lexmark0381.ddns.net:9091";
-//            command = "list localhost:9999";
-//            command = "copy localhost:9999 file localhost:9999";
+            command = input.readLine("FileController: ").toLowerCase();
             String[] Commands = command.split(" ");
             if (Commands[0].equals("list") || Commands[0].equals("copy") || Commands[0].equals("bye") || Commands[0].equals("help")) {
                 if (Commands[0].equals("list")) {
@@ -90,7 +87,7 @@ class FileController {
 
                 }
                 if (Commands[0].equals("bye")) {
-                    System.out.println("C ya\n");
+                    System.out.println("Closing FileController.");
                     System.exit(0);
                 }
                 if (Commands[0].equals("help")) {
